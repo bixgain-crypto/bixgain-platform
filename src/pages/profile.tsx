@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/use-auth';
-import { supabase } from '../lib/supabase';
+import { getStoredProfile, setStoredProfile } from '../lib/local-storage';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -23,12 +23,11 @@ export default function ProfilePage() {
   const handleSave = async () => {
     if (!user || !displayName.trim()) return;
     try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ display_name: displayName.trim() })
-        .eq('user_id', user.id);
-      
-      if (error) throw error;
+      const currentProfile = getStoredProfile();
+      if (!currentProfile) throw new Error('Profile not found');
+
+      currentProfile.display_name = displayName.trim();
+      setStoredProfile(currentProfile);
       
       toast.success('Profile updated!');
       setEditing(false);

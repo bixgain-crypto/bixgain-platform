@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { getTransactions, type Transaction } from '../lib/local-storage';
 import { useAuth } from '../hooks/use-auth';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
@@ -7,24 +7,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Wallet, ArrowDownLeft, ArrowUpRight, History, Coins, CreditCard } from 'lucide-react';
 
 export default function WalletPage() {
-  const { profile } = useAuth();
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const { profile, user } = useAuth();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      if (profile?.user_id) {
-        const { data: history } = await supabase
-          .from('transactions')
-          .select('*')
-          .eq('user_id', profile.user_id)
-          .order('created_at', { ascending: false })
-          .limit(10);
-        
-        setTransactions(history || []);
-      }
-    };
-    fetchTransactions();
-  }, [profile]);
+    if (user) {
+      setTransactions(getTransactions(user.id).slice(0, 10));
+    }
+  }, [user, profile]);
 
   return (
     <DashboardLayout activePath="/wallet">

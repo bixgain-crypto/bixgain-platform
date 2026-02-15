@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/use-auth';
-import { fetchSharedData } from '../lib/shared-data';
+import { getReferralHistory } from '../lib/local-storage';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -16,21 +16,10 @@ export default function ReferralsPage() {
   const [referralCount, setReferralCount] = useState(0);
 
   useEffect(() => {
-    const fetchReferrals = async () => {
-      if (!user) return;
-      try {
-        // Use shared-data edge function (service-role) to bypass RLS
-        // referral_history user_id='system' so RLS blocks client-side reads
-        const allHistory = await fetchSharedData('referral_history');
-        // Filter to current user's referrals
-        const myReferrals = allHistory.filter((r: any) => r.referrer_id === user.id);
-        setReferralHistory(myReferrals);
-        setReferralCount(myReferrals.length);
-      } catch {
-        // referral_history may be empty
-      }
-    };
-    fetchReferrals();
+    if (!user) return;
+    const myReferrals = getReferralHistory(user.id);
+    setReferralHistory(myReferrals);
+    setReferralCount(myReferrals.length);
   }, [user]);
 
   const referralCode = profile?.referral_code || 'BIX-XXXXXX';

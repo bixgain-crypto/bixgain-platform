@@ -2,7 +2,7 @@ import { Search, Bell, Coins } from 'lucide-react';
 import { useAuth } from '../hooks/use-auth';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Avatar, AvatarFallback } from './ui/avatar';
 
 export function Header() {
   const { profile, user } = useAuth();
@@ -34,7 +34,6 @@ export function Header() {
             <p className="text-xs text-muted-foreground">Level 1 Miner</p>
           </div>
           <Avatar className="h-9 w-9 border-2 border-primary/20">
-            <AvatarImage src={user?.user_metadata?.avatar_url} />
             <AvatarFallback className="bg-primary/20 text-primary font-bold">
               {profile?.display_name?.charAt(0) || 'U'}
             </AvatarFallback>

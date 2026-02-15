@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/use-auth';
 import { fetchSharedData } from '../lib/shared-data';
 import { rewardEngine } from '../lib/reward-engine';
+import { getCompletedTaskIds } from '../lib/local-storage';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -48,14 +48,13 @@ export default function QuestsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [taskList, userTasksRes, pendingRes] = await Promise.all([
+        const [taskList, pendingRes] = await Promise.all([
           fetchSharedData('tasks'),
-          user ? supabase.from('user_tasks').select('task_id').eq('user_id', user.id).eq('status', 'completed') : Promise.resolve({ data: [] }),
           user ? rewardEngine.getPendingRewards() : Promise.resolve([])
         ]);
         setTasks(taskList || []);
-        const userTasks = (userTasksRes as any).data || [];
-        setCompletedTaskIds(new Set(userTasks.map((ut: any) => ut.task_id)));
+        const completedIds = user ? getCompletedTaskIds(user.id) : [];
+        setCompletedTaskIds(new Set(completedIds));
         setPendingRewards(pendingRes || []);
       } catch (err) {
         console.error('Error fetching quests:', err);

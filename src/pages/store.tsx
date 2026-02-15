@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/use-auth';
 import { fetchSharedData } from '../lib/shared-data';
+import { getStoredProfile, setStoredProfile, addTransaction } from '../lib/local-storage';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -30,27 +30,24 @@ export default function StorePage() {
   }, []);
 
   const handlePurchase = async (item: any) => {
-    if (!user || profile.balance < item.price) {
+    if (!user || !profile || profile.balance < item.price) {
       toast.error('Insufficient BIX balance!');
       return;
     }
 
     try {
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .update({ balance: profile.balance - item.price })
-        .eq('user_id', user.id);
-      
-      if (profileError) throw profileError;
+      const currentProfile = getStoredProfile();
+      if (!currentProfile) throw new Error('Profile not found');
 
-      const { error: txError } = await supabase.from('transactions').insert({
+      currentProfile.balance -= item.price;
+      setStoredProfile(currentProfile);
+
+      addTransaction({
         user_id: user.id,
         amount: -item.price,
         type: 'spend',
         description: `Purchased ${item.name} from Store`,
       });
-      
-      if (txError) throw txError;
 
       toast.success(`Successfully purchased ${item.name}!`);
       refreshProfile();

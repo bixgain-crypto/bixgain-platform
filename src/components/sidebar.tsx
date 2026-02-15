@@ -20,6 +20,7 @@ export function AppSidebar({ activePath }: { activePath: string }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const isAdmin = profile?.role === 'admin' || user?.email === 'bixgain@gmail.com';
+  const userEmail = user?.email || '';
 
   return (
     <>
@@ -80,7 +81,7 @@ export function AppSidebar({ activePath }: { activePath: string }) {
           <div className="pt-4 border-t border-border space-y-4">
             <div className="px-3 py-2 bg-muted/50 rounded-lg">
               <p className="text-xs text-muted-foreground uppercase font-semibold mb-1">My Account</p>
-              <p className="text-sm font-medium truncate">{user?.email}</p>
+              <p className="text-sm font-medium truncate">{userEmail}</p>
             </div>
             <Button 
               variant="ghost" 

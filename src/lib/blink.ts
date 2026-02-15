@@ -1,13 +1,4 @@
-import { createClient } from '@blinkdotnew/sdk';
-
-/**
- * Blink SDK client instance for BixGain Rewards App.
- * Handles Auth, Database, Storage, and AI.
- */
-export const blink = createClient({
-  projectId: import.meta.env.VITE_BLINK_PROJECT_ID || 'bixgain-rewards-app-gh9qbc8y',
-  publishableKey: import.meta.env.VITE_BLINK_PUBLISHABLE_KEY,
-  auth: {
-    mode: 'managed',
-  },
-});
+// DEPRECATED: Blink SDK auth and database have been removed.
+// All data now uses localStorage via local-storage.ts.
+// This file is kept as a stub for any remaining imports.
+export const blink = null as any;
